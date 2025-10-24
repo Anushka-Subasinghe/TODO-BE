@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+enum PriorityRole {
+  low
+  med
+  high
+}
+
+enum StatusType {
+  queued
+  running
+  done
+  failed
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  passwordHash String
+  tasks Task[]
+  refreshTokens RefreshToken[]
+  exportJobs ExportJob[]
+}
+
+model Task {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  title String
+  priority PriorityRole
+  description String
+  dueDate DateTime?
+  done Boolean @default(false)
+  orderIndex Int
+  version Float @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  tokenHash String
+  familyId String
+  revoked Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ExportJob {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  scope String
+  status StatusType
+  filePath String?
+  error String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
