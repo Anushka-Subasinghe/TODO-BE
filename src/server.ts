@@ -14,7 +14,6 @@ const limiter = rateLimit({
 });
 
 import taskRouter from "./routes/task.router";
-import userRouter from "./routes/user.router";
 import sseRouter from "./routes/sse.router";
 import authRouter from "./routes/auth.router";
 
@@ -38,8 +37,6 @@ app.use(limiter);
 app.use(bodyParser.urlencoded());
 
 app.use(hpp());
-
-app.use("/users", userRouter);
 
 app.use("/auth", authRouter);
 
