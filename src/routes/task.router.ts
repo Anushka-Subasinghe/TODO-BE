@@ -12,7 +12,7 @@ const taskRouter = Router();
 
 taskRouter.get("/", getTasksByStatus);
 taskRouter.post("/", validateData(createTaskSchema), createTask);
-taskRouter.put("/reorder", reorderTasks);
-taskRouter.put("/:id", updateTask);
+taskRouter.patch("/reorder", reorderTasks);
+taskRouter.patch("/:id", updateTask);
 
 export default taskRouter;

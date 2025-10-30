@@ -19,13 +19,15 @@ import authRouter from "./routes/auth.router";
 
 const app = express();
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+const FE_URL = process.env.FE_URL;
 
 app.use(helmet());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: FE_URL,
     credentials: true,
   })
 );
