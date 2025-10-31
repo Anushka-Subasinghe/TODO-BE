@@ -3,7 +3,7 @@ import {
   startExport,
   getExportStatus,
   downloadCSV,
-} from "../controllers/exportController";
+} from "../controllers/export.controller";
 import { requireAuth } from "../middleware/auth";
 
 const router = express.Router();
