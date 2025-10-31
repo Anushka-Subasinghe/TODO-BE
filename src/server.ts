@@ -16,6 +16,7 @@ const limiter = rateLimit({
 import taskRouter from "./routes/task.router";
 import sseRouter from "./routes/sse.router";
 import authRouter from "./routes/auth.router";
+import exportRouter from "./routes/export.router";
 
 const app = express();
 
@@ -45,6 +46,8 @@ app.use("/auth", authRouter);
 app.use("/tasks", taskRouter);
 
 app.use("/stream", sseRouter);
+
+app.use("/exports", exportRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
