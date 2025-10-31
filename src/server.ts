@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 var hpp = require("hpp");
 
 const limiter = rateLimit({
@@ -34,6 +35,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.use(limiter);
 

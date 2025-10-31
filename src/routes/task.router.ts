@@ -7,12 +7,13 @@ import {
   reorderTasks,
   updateTask,
 } from "../controllers/task.controller";
+import { requireAuth } from "../middleware/auth";
 
 const taskRouter = Router();
 
-taskRouter.get("/", getTasksByStatus);
-taskRouter.post("/", validateData(createTaskSchema), createTask);
-taskRouter.patch("/reorder", reorderTasks);
-taskRouter.patch("/:id", updateTask);
+taskRouter.get("/", requireAuth, getTasksByStatus);
+taskRouter.post("/", requireAuth, validateData(createTaskSchema), createTask);
+taskRouter.patch("/reorder", requireAuth, reorderTasks);
+taskRouter.patch("/:id", requireAuth, updateTask);
 
 export default taskRouter;

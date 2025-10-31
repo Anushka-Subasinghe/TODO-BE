@@ -4,13 +4,14 @@ import {
   getExportStatus,
   downloadCSV,
 } from "../controllers/exportController";
+import { requireAuth } from "../middleware/auth";
 
 const router = express.Router();
 
-router.post("/csv/:userId", startExport);
+router.post("/csv/:userId", requireAuth, startExport);
 
-router.get("/csv/:jobId", getExportStatus);
+router.get("/csv/:jobId", requireAuth, getExportStatus);
 
-router.get("/csv/:jobId/:userId/file", downloadCSV);
+router.get("/csv/:jobId/:userId/file", requireAuth, downloadCSV);
 
 export default router;
