@@ -21,13 +21,21 @@ export const sse = (req, res) => {
     res.write(`event: task_updated\ndata: ${JSON.stringify(data)}\n\n`);
   };
 
+  const sendExportUpdateEvent = (data: any) => {
+    res.write(`event: export_update\ndata: ${JSON.stringify(data)}\n\n`);
+  };
+
   sseEmitter.on("task_created", sendCreateEvent);
   sseEmitter.on("task_reordered", sendReOrderEvent);
   sseEmitter.on("task_updated", sendUpdateEvent);
+  sseEmitter.on("export_update", sendExportUpdateEvent);
 
   req.on("close", () => {
     sseEmitter.removeListener("task_created", sendCreateEvent);
-    sseEmitter.removeListener("task_reOrdered", sendReOrderEvent);
+    sseEmitter.removeListener("task_reordered", sendReOrderEvent);
     sseEmitter.removeListener("task_updated", sendUpdateEvent);
+    sseEmitter.removeListener("export_update", sendExportUpdateEvent);
   });
 };
+
+export default sseRouter;

@@ -26,8 +26,8 @@ export async function login(req: Request, res: Response) {
 
   res.cookie("refresh", `${familyId}:${refreshToken}`, {
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
     maxAge: 14 * 24 * 60 * 60 * 1000,
     path: "/",
   });
@@ -36,49 +36,21 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function refresh(req: Request, res: Response) {
-  const cookie = req.cookies?.refresh as string | undefined;
+  const cookie = req.cookies?.refresh;
   if (!cookie) return res.status(401).json({ error: "No refresh token" });
 
   const [familyId, token] = cookie.split(":");
-  const family = await prisma.refreshToken.findFirst({
+  const record = await prisma.refreshToken.findFirst({
     where: { familyId, revoked: false },
     orderBy: { createdAt: "desc" },
   });
-  if (!family) return res.status(401).json({ error: "Invalid refresh" });
+  if (!record) return res.status(401).json({ error: "Invalid refresh token" });
 
-  const reused = !compareHash(token, family.tokenHash);
-  if (reused) {
-    await refreshTokenClient.updateMany({
-      where: { familyId },
-      data: { revoked: true },
-    });
-    return res.status(401).json({ error: "Refresh token reuse detected" });
-  }
+  const valid = compareHash(token, record.tokenHash);
+  if (!valid) return res.status(401).json({ error: "Invalid refresh token" });
 
-  const refreshToken = randomUUID();
-  const accessToken = signAccessToken(family.userId);
-
-  await refreshTokenClient.create({
-    data: {
-      userId: family.userId,
-      tokenHash: hashToken(refreshToken),
-      familyId,
-    },
-  });
-  await refreshTokenClient.update({
-    where: { id: family.id },
-    data: { revoked: true },
-  });
-
-  res.cookie("refresh", `${familyId}:${refreshToken}`, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
-    maxAge: 14 * 24 * 60 * 60 * 1000,
-    path: "/",
-  });
-
-  res.json({ accessToken });
+  const accessToken = signAccessToken(record.userId);
+  return res.json({ accessToken });
 }
 
 export async function logout(req: Request, res: Response) {

@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 var hpp = require("hpp");
 
 const limiter = rateLimit({
@@ -16,21 +17,26 @@ const limiter = rateLimit({
 import taskRouter from "./routes/task.router";
 import sseRouter from "./routes/sse.router";
 import authRouter from "./routes/auth.router";
+import exportRouter from "./routes/export.router";
 
 const app = express();
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+const FE_URL = process.env.FE_URL;
 
 app.use(helmet());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: FE_URL,
     credentials: true,
   })
 );
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.use(limiter);
 
@@ -43,6 +49,8 @@ app.use("/auth", authRouter);
 app.use("/tasks", taskRouter);
 
 app.use("/stream", sseRouter);
+
+app.use("/exports", exportRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
